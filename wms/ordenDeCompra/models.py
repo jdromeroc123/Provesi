@@ -10,7 +10,7 @@ class OrdenDeCompra(models.Model):
     fecha = models.DateField()
     valor = models.FloatField()
     producto = models.OneToOneField(Producto, on_delete=models.CASCADE)
-    pedido = models.OneToOneField(Pedido, on_delete=models.CASCADE)
+    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
     
     def __str__(self):
         return '{0} productos por un total de {1}'.format(self.cantidad, self.valor)

@@ -3,12 +3,12 @@ from django.db import models
 # Create your models here.
 
 class Producto(models.Model):
-    name = models.CharField(max_length=100)
+    nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     precioUnitario = models.DecimalField(max_digits=10, decimal_places=2)
     cantidadDisponible = models.IntegerField()
     volumen = models.FloatField()
     
     def __str__(self):
-        return '{}'.format(self.name)
+        return '{}'.format(self.nombre)
     
