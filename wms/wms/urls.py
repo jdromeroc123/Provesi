@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -23,4 +24,9 @@ urlpatterns = [
     path('', include('ordenDeCompra.urls')),
     path('', include('pedido.urls')),
     path('', include('estado.urls')),
+    path(r'', include('django.contrib.auth.urls')),
+    path(r'', include('social_django.urls')),
+    path('login/', views.login, name='login'),
+    path('callback/', views.callback, name='callback'),
+    path('logout/', views.logout, name='logout'),
 ]

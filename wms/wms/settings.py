@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'cliente',
     'pedido',
     'estado',
+    'social_django',
 ]
 
 MIDDLEWARE = [
@@ -132,3 +133,19 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+LOGIN_URL = "/login/auth0" 
+LOGIN_REDIRECT_URL = "http://192.168.0.8:8080/api" 
+LOGOUT_REDIRECT_URL = "http://192.168.0.8:8080/api"
+
+SOCIAL_AUTH_TRAILING_SLASH = False # Remove end slash from routes 
+SOCIAL_AUTH_AUTH0_DOMAIN = 'dev-u5wk1gn513c6vlnk.us.auth0.com'
+SOCIAL_AUTH_AUTH0_KEY = 'rcxk7rzCESTzyks6RAVyX708u3UU1mCb'
+SOCIAL_AUTH_AUTH0_SECRET = 'IRxtA_DnwbBiSvIalLONMSOPuIi7e78285z26s8FO2GWhgQyPNF8aId3-el8bvIO'
+SOCIAL_AUTH_AUTH0_SCOPE = [ 'openid', 
+                           'profile',
+                           'email',
+                           'role', ]
+AUTHENTICATION_BACKENDS = { 'wms.auth0backend.Auth0', 
+                           'django.contrib.auth.backends.ModelBackend', }
