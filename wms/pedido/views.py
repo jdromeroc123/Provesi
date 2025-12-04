@@ -1,18 +1,22 @@
-from django.shortcuts import render
-from rest_framework import viewsets
-from rest_framework.response import Response
-from rest_framework.decorators import action
-from .models import Pedido 
-from .serializers import PedidoSerializer
-# Create your views here.
+from rest_framework_mongoengine.viewsets import ModelViewSet
+from .models import Pedido
+from .subset import PedidosPendientes
+from .serializers import PedidoSerializer, PedidosPendientesSerializer
 
-class PedidoViewSet(viewsets.ModelViewSet):
-    queryset=Pedido.objects.all()
-    serializer_class=PedidoSerializer
-    
-    @action(detail=False, methods=['get'], url_path='pendientes')
-    def pedidos_pendientes(self, request):
-        estados_finales = ['DESPACHADO', 'ENTREGADO', 'DEVUELTO']
-        pedidos = Pedido.objects.exclude(estado_actual__in=estados_finales)
-        serializer = self.get_serializer(pedidos, many=True)
-        return Response(serializer.data)
+
+class PedidoViewSet(ModelViewSet):
+    """
+    CRUD completo para Pedido usando MongoEngine
+    """
+    lookup_field = 'id'   # Para que use el ObjectId de Mongo
+    serializer_class = PedidoSerializer
+    queryset = Pedido.objects.all()
+
+
+class PedidosPendientesViewSet(ModelViewSet):
+    """
+    Endpoints optimizados para leer datos rápidos usando el subset pattern
+    """
+    lookup_field = 'id'
+    serializer_class = PedidosPendientesSerializer
+    queryset = PedidosPendientes.objects.all()

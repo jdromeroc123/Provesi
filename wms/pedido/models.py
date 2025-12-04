@@ -1,34 +1,54 @@
-from django.db import models
+from mongoengine import (
+    Document,
+    DateField,
+    StringField,
+    DecimalField
+)
 
-from cliente.models import Cliente
-# Create your models here.
+class NombreEstado:
+    EN_TRANSITO = 'EN_TRANSITO'
+    EN_ALISTAMIENTO = 'EN_ALISTAMIENTO'
+    POR_VERIFICAR = 'POR_VERIFICAR'
+    VERIFICADO = 'VERIFICADO'
+    RECHAZADO_VERIFICACION = 'RECHAZADO_VERIFICACION'
+    EMPACADO = 'EMPACADO'
+    FACTURACION_PENDIENTE = 'FACTURACION_PENDIENTE'
+    FACTURADO = 'FACTURADO'
+    DESPACHADO = 'DESPACHADO'
+    ENTREGADO = 'ENTREGADO'
+    DEVUELTO = 'DEVUELTO'
 
-class NombreEstado(models.TextChoices):
-    EN_TRANSITO = 'EN_TRANSITO', 'En tránsito'
-    EN_ALISTAMIENTO = 'EN_ALISTAMIENTO', 'En alistamiento'
-    POR_VERIFICAR = 'POR_VERIFICAR', 'Por verificar'
-    VERIFICADO = 'VERIFICADO', 'Verificado'
-    RECHAZADO_VERIFICACION = 'RECHAZADO_VERIFICACION', 'Rechazado por verificación'
-    EMPACADO = 'EMPACADO', 'Empacado'
-    FACTURACION_PENDIENTE = 'FACTURACION_PENDIENTE', 'Facturación pendiente'
-    FACTURADO = 'FACTURADO', 'Facturado'
-    DESPACHADO = 'DESPACHADO', 'Despachado'
-    ENTREGADO = 'ENTREGADO', 'Entregado'
-    DEVUELTO = 'DEVUELTO', 'Devuelto'
+    CHOICES = [
+        EN_TRANSITO,
+        EN_ALISTAMIENTO,
+        POR_VERIFICAR,
+        VERIFICADO,
+        RECHAZADO_VERIFICACION,
+        EMPACADO,
+        FACTURACION_PENDIENTE,
+        FACTURADO,
+        DESPACHADO,
+        ENTREGADO,
+        DEVUELTO,
+    ]
 
-class Pedido(models.Model):
-    fechaCreacion = models.DateField()
-    observaciones = models.TextField()
-    valorTotal = models.DecimalField(max_digits=10, decimal_places=2)
-    direccion = models.TextField()
-    guia = models.TextField()
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
-    estado_actual = models.CharField(
-        max_length=100,
-        choices=NombreEstado.choices,
+
+class Pedido(Document):
+    fechaCreacion = DateField(required=True)
+    observaciones = StringField()
+    valorTotal = DecimalField(precision=2, required=True)
+    direccion = StringField()
+    guia = StringField()
+    cliente = StringField()
+    estado_actual = StringField(
+        choices=NombreEstado.CHOICES,
         default=NombreEstado.EN_TRANSITO
     )
-    
+
+    meta = {
+        'collection': 'pedidos',
+        'ordering': ['-fechaCreacion']
+    }
+
     def __str__(self):
-        return 'Pedido creado el {0} con un valor total de {1} en direccion a {2}'.format(self.fechaCreacion, self.valorTotal, self.direccion)
-    
+        return f'Pedido del {self.fechaCreacion} por {self.valorTotal} hacia {self.direccion}'
