@@ -4,6 +4,7 @@ from mongoengine import (
     StringField,
     DecimalField
 )
+from .subset import PedidosPendientes
 
 class NombreEstado:
     EN_TRANSITO = 'EN_TRANSITO'
@@ -52,3 +53,36 @@ class Pedido(Document):
 
     def __str__(self):
         return f'Pedido del {self.fechaCreacion} por {self.valorTotal} hacia {self.direccion}'
+
+    def save(self, *args, **kwargs):
+        """
+        Sobrescribe save para mantener sincronizado PedidosPendientes.
+        """
+        # Guardamos el pedido primero
+        super().save(*args, **kwargs)
+
+        estados_pendientes = [
+            NombreEstado.EN_TRANSITO,
+            NombreEstado.EN_ALISTAMIENTO,
+            NombreEstado.POR_VERIFICAR,
+            NombreEstado.VERIFICADO,
+            NombreEstado.RECHAZADO_VERIFICACION,
+            NombreEstado.EMPACADO,
+            NombreEstado.FACTURACION_PENDIENTE,
+            NombreEstado.FACTURADO
+        ]
+
+        if self.estado_actual in estados_pendientes:
+
+            PedidosPendientes.objects.update_one(
+                pedido=self,
+                set__pedido=self,
+                set__fechaCreacion=self.fechaCreacion,
+                set__estado_actual=self.estado_actual,
+                set__valorTotal=self.valorTotal,
+                set__cliente=self.cliente,
+                upsert=True 
+            )
+        else:
+        
+            PedidosPendientes.objects(pedido=self).delete()
